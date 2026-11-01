@@ -2,6 +2,7 @@ import { body, param } from "express-validator";
 import { validate } from "../validate.js";
 import { EventModel } from "../../models/event.model.js";
 import { CategoryModel } from "../../models/category.model.js";
+import { UserModel } from "../../models/user.model.js";
 
 export const agregateEvenValidation = [
   body("title")
@@ -30,7 +31,7 @@ export const agregateEvenValidation = [
     .withMessage("el startDate debe ser obligatorio")
     .bail()
     .isISO8601()
-    .withMessage("Formato de fecha inválido (YYYY-MM-DD)")
+    .withMessage("Formato de fecha válido (YYYY-MM-DD)")
     .bail(),
   body("endDate")
     .notEmpty()
@@ -58,26 +59,30 @@ export const agregateEvenValidation = [
     .optional()
     .isFloat({ min: 0 })
     .withMessage("el price debe ser mayor o igual a 0"),
+  body("organizer")
+    .notEmpty()
+    .withMessage("el organizer debe ser obligatorio")
+    .bail()
+    .isMongoId()
+    .withMessage("el id del organizador debe ser valido")
+    .bail()
+
+    .custom(async (user) => {
+      const userExiste = await UserModel.findOne({
+        _id: user,
+        deletedAt: null,
+      });
+      if (!userExiste) {
+        throw new Error("el organizador no existe");
+      }
+    }),
   body("status")
     .optional()
     .isIn(["scheduled", "cancelled", "finished"])
     .withMessage(
       "el status debe ser al menos: scheduled, cancelled o finished",
     ),
-  body("categories")
-    .optional()
-    .isArray()
-    .withMessage("categories debe ser una lista")
-    .bail()
-    .custom(async (categories) => {
-      const categoryEncontrada = await CategoryModel.find({
-        _id: { $in: categories },
-      });
-      if (categoryEncontrada.length !== categories.length) {
-        throw new Error("algunas de las categorias no existe ");
-      }
-    }),
-  body("categories.*").isMongoId().withMessage("el id debe ser valido"),
+
   body("location").notEmpty().withMessage("la location debe ser obligatorio"),
   body("location.venue")
     .notEmpty()
@@ -97,6 +102,32 @@ export const agregateEvenValidation = [
     .bail()
     .isLength({ min: 2, max: 50 })
     .withMessage("city debe ser almenos minimo 2 o maximo 50 caracteres "),
+  body("categories")
+    .optional()
+    .isArray()
+    .withMessage("categories debe ser una lista")
+    .bail()
+    .custom(async (categories) => {
+      const categoryEncontrada = await CategoryModel.find({
+        _id: { $in: categories },
+      });
+      if (categoryEncontrada.length !== categories.length) {
+        throw new Error("algunas de las categorias no existe ");
+      }
+    }),
+  body("categories.*").isMongoId().withMessage("el id debe ser valido"),
+];
+export const idEventValidation = [
+  param("id")
+    .isMongoId()
+    .withMessage("el id debe ser valido")
+    .bail()
+    .custom(async (id) => {
+      const idExiste = await EventModel.findOne({ _id: id });
+      if (!idExiste) {
+        throw new Error("el evento que buscas no existe");
+      }
+    }),
 ];
 
 export const updateEvenValidation = [
