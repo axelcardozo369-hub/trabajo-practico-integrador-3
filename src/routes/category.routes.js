@@ -10,27 +10,33 @@ import { validate } from "../middlewares/validate.js";
 import {
   agregateCategoryValidation,
   deleteCategoryValidation,
+  idCategoryValidation,
   updateCategoryValidation,
 } from "../middlewares/validation/category.validation.js";
 
 export const categoryRouter = Router();
 
 categoryRouter.post(
-  "categorys",
+  "/categories",
   agregateCategoryValidation,
   validate,
   agregateCategory,
 );
-categoryRouter.get("categorys", getAllCategorys);
-categoryRouter.get("categorys/:id", getIdCategory);
+categoryRouter.get("/categories", getAllCategorys);
+categoryRouter.get(
+  "/categories/:id",
+  idCategoryValidation,
+  validate,
+  getIdCategory,
+);
 categoryRouter.put(
-  "categorys",
+  "/categories/:id",
   updateCategoryValidation,
   validate,
   updateCategory,
 );
 categoryRouter.delete(
-  "categorys",
+  "/categories/:id",
   deleteCategoryValidation,
   validate,
   deleteCategory,

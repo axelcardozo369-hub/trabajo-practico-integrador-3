@@ -29,7 +29,7 @@ export const updateCategoryValidation = [
     .withMessage("el id debe ser valido")
     .bail()
     .custom(async (id) => {
-      const idExiste = await CategoryModel.findOne({ id });
+      const idExiste = await CategoryModel.findOne({ _id: id });
       if (!idExiste) {
         throw new Error("no se encuentra esta id");
       }
@@ -67,6 +67,19 @@ export const deleteCategoryValidation = [
       const categorieExiste = await CategoryModel.findOne({ _id: id });
       if (!categorieExiste) {
         throw new Error("la categoria que quieres borrar no existe");
+      }
+    }),
+];
+export const idCategoryValidation = [
+  param("id")
+    .isMongoId()
+    .withMessage("el id debe ser valido")
+    .bail()
+    .custom(async (id) => {
+      const idExiste = await CategoryModel.find({ _id: id });
+
+      if (!idExiste) {
+        throw new Error("el id que buscás no existe");
       }
     }),
 ];
