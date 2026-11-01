@@ -79,7 +79,10 @@ export const updateUserValidation = [
     .withMessage("el id debe ser valido")
     .bail()
     .custom(async (user) => {
-      const userExiste = await UserModel.findOne({ _id: user });
+      const userExiste = await UserModel.findOne({
+        _id: user,
+        deletedAt: null,
+      });
       if (!userExiste) {
         throw new Error(
           "el usuario que quieres editar no existe en la base de datos",
@@ -117,19 +120,31 @@ export const updateUserValidation = [
     .withMessage("el email debe ser obligatorio")
     .bail()
     .isEmail()
-    .withMessage("el email debe ser valido"),
+    .withMessage("el email debe ser valido")
+    .bail()
+    .custom(async (email, { req }) => {
+      const existeEmail = await UserModel.findOne({
+        email: email,
+        _id: { $ne: req.params.id },
+      });
+      if (existeEmail) {
+        throw new Error(
+          "el email que quieres ingresar ya tiene uso otro usuario",
+        );
+      }
+    }),
   body("password")
     .optional()
     .notEmpty()
     .withMessage("el password debe ser obligatorio")
     .bail()
-    .isLength({ min: 8 })
-    .withMessage("el password debe ser al menos de 6 a 10 digitos ")
-    .bail()
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/)
     .withMessage(
       "la password debe contener al menos una mayuscula ,una minúscula y un número ",
-    ),
+    )
+    .bail()
+    .isLength({ min: 8 })
+    .withMessage("el password debe ser al menos de 6 a 10 digitos "),
   body("profile")
     .optional()
     .notEmpty()
@@ -166,9 +181,21 @@ export const deleteUserValidation = [
     .withMessage("el id debe ser valido")
     .bail()
     .custom(async (id) => {
-      const idExiste = await UserModel.findOne({ _id: id });
+      const idExiste = await UserModel.findOne({ _id: id, deletedAt: null });
       if (!idExiste) {
         throw new Error("el id que quieres eliminar no existe");
+      }
+    }),
+];
+export const getIdUserValidation = [
+  param("id")
+    .isMongoId()
+    .withMessage("el id debe ser valido")
+    .bail()
+    .custom(async (id) => {
+      const idExiste = await UserModel.findOne({ _id: id, deletedAt: null });
+      if (!idExiste) {
+        throw new Error("el usuario que buscas no existe");
       }
     }),
 ];
