@@ -55,3 +55,26 @@ export const login = async (req, res) => {
     return res.status(500).json({ message: "error interno de servidor" });
   }
 };
+export const getProfile = async (req, res) => {
+  try {
+    const profile = await UserModel.findOne({
+      _id: req.user.idUser,
+      deletedAt: null,
+    }).select("-password");
+
+    return res
+      .status(200)
+      .json({ message: "este es el perfil ", data: profile });
+  } catch (error) {
+    return res.status(500).json({ message: "error interno del servidor " });
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("token"); // Eliminar cookie del navegador
+    return res.json({ message: "Logout exitoso" });
+  } catch (error) {
+    return res.status(500).json({ message: "error interno del servidor" });
+  }
+};
