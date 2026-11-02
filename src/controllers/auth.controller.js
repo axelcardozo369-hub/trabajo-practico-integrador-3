@@ -78,3 +78,25 @@ export const logout = async (req, res) => {
     return res.status(500).json({ message: "error interno del servidor" });
   }
 };
+export const updateProfile = async (req, res) => {
+  try {
+    const data = matchedData(req, { locations: ["body"] });
+    const user = await UserModel.findOne({
+      _id: req.user.idUser,
+      deletedAt: null,
+    }).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "usuario no encontrado" });
+    }
+    if (data.firstName) user.profile.firstName = data.firstName;
+    if (data.lastName) user.profile.lastName = data.lastName;
+    if (data.birthDate) user.profile.birthDate = data.birthDate;
+    if (data.phone) user.profile.phone = data.phone;
+    await user.save();
+
+    return res.status(200).json({ message: "profile modificado", data: user });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "error interno del servidor" });
+  }
+};
