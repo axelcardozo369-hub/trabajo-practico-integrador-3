@@ -26,3 +26,32 @@ export const register = async (req, res) => {
     return res.status(500).json({ message: "error interno del servidor " });
   }
 };
+export const login = async (req, res) => {
+  try {
+    const { email, password } = matchedData(req);
+    const userExiste = await UserModel.findOne({ email, deletedAt: null });
+    if (!userExiste) {
+      return res.status(401).json({ message: "credenciales invalidas" });
+    }
+    const validPassword = await comparePassword(password, userExiste.password);
+    if (!validPassword) {
+      return res.status(401).json({ message: "credenciales invalidas" });
+    }
+
+    //!Genero el token
+    const token = generateToken({
+      idUser: userExiste.id,
+      role: userExiste.role,
+    });
+
+    //!Envio el token como cookie
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 10,
+    });
+    return res.status(200).json({ message: "usuario logueado correctamente" });
+  } catch (error) {
+    return res.status(500).json({ message: "error interno de servidor" });
+  }
+};
