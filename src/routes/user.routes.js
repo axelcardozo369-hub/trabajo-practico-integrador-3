@@ -1,6 +1,5 @@
 import { Router } from "express";
 import {
-  agregateUser,
   deleteUser,
   getAllUsers,
   getIdUser,
@@ -8,16 +7,36 @@ import {
 } from "../controllers/user.controller.js";
 import { validate } from "../middlewares/validate.js";
 import {
-  agregateUserValidation,
   deleteUserValidation,
   getIdUserValidation,
   updateUserValidation,
 } from "../middlewares/validation/user.validation.js";
-
+import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { adminMiddleware } from "../middlewares/admin.middleware.js";
 export const userRouter = Router();
 
-userRouter.post("/user", agregateUserValidation, validate, agregateUser);
-userRouter.get("/user", getAllUsers);
-userRouter.get("/user/:id", getIdUserValidation, validate, getIdUser);
-userRouter.put("/user/:id", updateUserValidation, validate, updateUser);
-userRouter.delete("/user/:id", deleteUserValidation, validate, deleteUser);
+userRouter.get("/users", authMiddleware, adminMiddleware, getAllUsers);
+userRouter.get(
+  "/users/:id",
+  authMiddleware,
+  adminMiddleware,
+  getIdUserValidation,
+  validate,
+  getIdUser,
+);
+userRouter.put(
+  "/users/:id",
+  authMiddleware,
+  adminMiddleware,
+  updateUserValidation,
+  validate,
+  updateUser,
+);
+userRouter.delete(
+  "/users/:id",
+  authMiddleware,
+  adminMiddleware,
+  deleteUserValidation,
+  validate,
+  deleteUser,
+);

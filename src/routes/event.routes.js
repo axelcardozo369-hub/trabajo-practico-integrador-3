@@ -4,6 +4,7 @@ import {
   deleteEvent,
   getAllEvents,
   getIdEvent,
+  getMyEvents,
   updateEvent,
 } from "../controllers/event.controller.js";
 import { validate } from "../middlewares/validate.js";
@@ -25,6 +26,7 @@ eventRouter.post(
   agregateEvent,
 );
 eventRouter.get("/events", authMiddleware, getAllEvents);
+eventRouter.get("/events/my", authMiddleware, getMyEvents);
 eventRouter.get("/events/:id", idEventValidation, validate, getIdEvent);
 eventRouter.put("/events/:id", updateEvenValidation, validate, updateEvent);
 eventRouter.delete("/events/:id", deleteEventValidation, validate, deleteEvent);

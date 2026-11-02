@@ -71,3 +71,16 @@ export const getIdEvent = async (req, res) => {
     return res.status(500).json({ message: "error interno del servidor" });
   }
 };
+
+export const getMyEvents = async (req, res) => {
+  try {
+    const misEventos = await EventModel.find({
+      organizer: req.user.idUser,
+    }).populate("categories");
+    return res
+      .status(200)
+      .json({ message: "estos son tus eventos", data: misEventos });
+  } catch (error) {
+    return res.status(500).json({ message: "error interno del servidor " });
+  }
+};
