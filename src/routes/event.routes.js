@@ -13,11 +13,18 @@ import {
   idEventValidation,
   updateEvenValidation,
 } from "../middlewares/validation/event.validation.js";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 export const eventRouter = Router();
 
-eventRouter.post("/events", agregateEvenValidation, validate, agregateEvent);
-eventRouter.get("/events", getAllEvents);
+eventRouter.post(
+  "/events",
+  authMiddleware,
+  agregateEvenValidation,
+  validate,
+  agregateEvent,
+);
+eventRouter.get("/events", authMiddleware, getAllEvents);
 eventRouter.get("/events/:id", idEventValidation, validate, getIdEvent);
 eventRouter.put("/events/:id", updateEvenValidation, validate, updateEvent);
 eventRouter.delete("/events/:id", deleteEventValidation, validate, deleteEvent);

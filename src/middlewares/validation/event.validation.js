@@ -59,23 +59,23 @@ export const agregateEvenValidation = [
     .optional()
     .isFloat({ min: 0 })
     .withMessage("el price debe ser mayor o igual a 0"),
-  body("organizer")
-    .notEmpty()
-    .withMessage("el organizer debe ser obligatorio")
-    .bail()
-    .isMongoId()
-    .withMessage("el id del organizador debe ser valido")
-    .bail()
+  // body("organizer")
+  //   .notEmpty()
+  //   .withMessage("el organizer debe ser obligatorio")
+  //   .bail()
+  //   .isMongoId()
+  //   .withMessage("el id del organizador debe ser valido")
+  //   .bail()
 
-    .custom(async (user) => {
-      const userExiste = await UserModel.findOne({
-        _id: user,
-        deletedAt: null,
-      });
-      if (!userExiste) {
-        throw new Error("el organizador no existe");
-      }
-    }),
+  //   .custom(async (user) => {
+  //     const userExiste = await UserModel.findOne({
+  //       _id: user,
+  //       deletedAt: null,
+  //     });
+  //     if (!userExiste) {
+  //       throw new Error("el organizador no existe");
+  //     }
+  //   }),
   body("status")
     .optional()
     .isIn(["scheduled", "cancelled", "finished"])

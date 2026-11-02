@@ -3,7 +3,10 @@ import { EventModel } from "../models/event.model.js";
 export const agregateEvent = async (req, res) => {
   try {
     const validationData = matchedData(req, { locations: ["body"] });
-    const newEvent = await EventModel.create(validationData);
+    const newEvent = await EventModel.create({
+      ...validationData,
+      organizer: req.user.idUser,
+    });
     return res
       .status(201)
       .json({ message: "evento agregado con exito", newEvent });

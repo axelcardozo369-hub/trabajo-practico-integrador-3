@@ -7,10 +7,14 @@ import { eventRouter } from "./src/routes/event.routes.js";
 import { UserModel } from "./src/models/user.model.js";
 import { EventModel } from "./src/models/event.model.js";
 import { authRouter } from "./src/routes/auth.routes.js";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 const app = express();
 const PORT = process.env.PORT;
 
 app.use(express.json());
+app.use(cors());
+app.use(cookieParser());
 app.use("/api", userRouter);
 app.use("/api", eventRouter);
 app.use("/api", categoryRouter);
